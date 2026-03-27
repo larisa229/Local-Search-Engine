@@ -34,11 +34,4 @@ public class FileMetadata {
     public String getAbsolutePath() {
         return absolutePath;
     }
-
-    @Override
-    public String toString() {
-        return "model.FileMetadata{name='" + name + "', extension='" + extension +
-                "', size=" + size + ", lastModified=" + lastModified +
-                ", path='" + absolutePath + "'}";
-    }
 }
