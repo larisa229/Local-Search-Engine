@@ -15,7 +15,6 @@ public class Config {
             properties.load(fis);
         } catch (IOException e) {
             System.err.println("Could not load config file: " + e.getMessage());
-            System.err.println("Using default values.");
         }
     }
 
