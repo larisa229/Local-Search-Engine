@@ -14,8 +14,7 @@ public class ChangeDetector {
 
     private static final String DELETE_STALE_SQL = """
             DELETE FROM files
-            WHERE absolute_path NOT IN (
-                SELECT unnest(?::text[])
+            WHERE absolute_path <> ALL (?::text[])
             )
             """;
 
