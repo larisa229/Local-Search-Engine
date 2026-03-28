@@ -15,7 +15,6 @@ public class ChangeDetector {
     private static final String DELETE_STALE_SQL = """
             DELETE FROM files
             WHERE absolute_path <> ALL (?::text[])
-            )
             """;
 
     public ChangeDetector(DatabaseConnection dbConnection) {
@@ -48,6 +47,10 @@ public class ChangeDetector {
     }
 
     public int removeDeletedFiles(List<String> presentPaths) throws SQLException {
+        if(presentPaths.isEmpty()) {
+            return 0;
+        }
+
         Connection conn = dbConnection.getConnection();
         Array pathArray = conn.createArrayOf("text", presentPaths.toArray());
         try (PreparedStatement stmt = conn.prepareStatement(DELETE_STALE_SQL)) {
