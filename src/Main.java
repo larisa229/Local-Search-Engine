@@ -3,6 +3,7 @@ import database.DatabaseConnection;
 import indexer.*;
 import model.FileMetadata;
 import model.FileRecord;
+import model.SearchResult;
 import search.*;
 
 import java.io.File;
@@ -10,6 +11,7 @@ import java.io.FileInputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
@@ -103,11 +105,29 @@ public class Main {
 
         report.print();
 
-        System.out.println("Single word search: 'crawler'");
-        searchController.search("crawler").forEach(System.out::println);
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("\nSearch mode. Type a query and press Enter. Type 'exit' to quit.");
+        System.out.print("> ");
 
-        System.out.println("Multi word search: 'public class'");
-        searchController.search("public class").forEach(System.out::println);
+        while(scanner.hasNextLine()) {
+            String query = scanner.nextLine().trim();
+            if(query.equals("exit")) break;
+            if(query.isBlank()) {
+                System.out.print("> ");
+                continue;
+            }
+
+            List<SearchResult> results = searchController.search(query);
+            if(results.isEmpty()) {
+                System.out.println("No results found for: " + query);
+            } else {
+                results.forEach(System.out::println);
+            }
+
+            System.out.print("> ");
+        }
+
+        scanner.close();
 
         try {
             dbConnection.close();
