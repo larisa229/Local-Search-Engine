@@ -37,7 +37,9 @@ public class Main {
         ChangeDetector changeDetector = new ChangeDetector(dbConnection);
         List<String> processedPaths = new ArrayList<>();
 
-        crawler.crawl(rootDir, file -> {
+        List<File> discoveredFiles = crawler.crawl(rootDir);
+
+        for (File file : discoveredFiles) {
             report.fileFound();
             System.out.println("Processing: " + file.getName());
 
@@ -52,9 +54,8 @@ public class Main {
                     System.err.println("Permission denied: " + file.getName());
                     report.permissionsDenied(file.getAbsolutePath());
                 }
-                return;
+                continue;
             }
-
             processedPaths.add(metadata.getAbsolutePath());
 
             try {
@@ -62,10 +63,10 @@ public class Main {
                         metadata.getAbsolutePath(), checksum
                 );
 
-                if(status == ChangeDetector.FileStatus.UNCHANGED) {
+                if (status == ChangeDetector.FileStatus.UNCHANGED) {
                     System.out.println("Unchanged, skipping: " + file.getName());
                     report.fileUnchanged();
-                    return;
+                    continue;
                 }
 
                 String preview = contentExtractor.extractPreview(file);
@@ -93,8 +94,7 @@ public class Main {
                 System.err.println("Failed to index: " + metadata.getAbsolutePath() + " — " + e.getMessage());
                 report.fileFailed(metadata.getAbsolutePath());
             }
-
-        }, report);
+        }
 
         try {
             int deleted = changeDetector.removeDeletedFiles(processedPaths);
