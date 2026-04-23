@@ -7,37 +7,47 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class QueryExecutor {
     private final DatabaseConnection dbConnection;
     private final ResultBuilder resultBuilder;
 
-    private static final String SEARCH_SQL = """
-        SELECT name, absolute_path, extension, size, content_preview,
-               ts_rank(doc, query) AS rank
-        FROM (
-            SELECT *, 
-                   to_tsvector('english', replace(name, '.', ' ') || ' ' || COALESCE(content_preview, '')) AS doc,
-                   to_tsquery('english', ?) AS query
-            FROM files
-        ) AS subquery
-        WHERE doc @@ query
-        ORDER BY rank DESC
-        """;
-
     public QueryExecutor(DatabaseConnection dbConnection, ResultBuilder resultBuilder) {
         this.dbConnection = dbConnection;
         this.resultBuilder = resultBuilder;
     }
 
-    public List<SearchResult> execute(String parsedQuery) throws SQLException {
-        Connection conn = dbConnection.getConnection();
+    public List<SearchResult> execute(ParsedQuery parsedQuery) throws SQLException {
+        StringBuilder sql = new StringBuilder(
+                "SELECT name, absolute_path, extension, size, content_preview, 1.0 as rank FROM files WHERE 1=1 "
+        );
+        List<String> params = new ArrayList<>();
 
-        try (PreparedStatement stmt = conn.prepareStatement(SEARCH_SQL)) {
-            stmt.setString(1, parsedQuery);
-            ResultSet rs = stmt.executeQuery();
-            return resultBuilder.build(rs);
+        // ILIKE - case-insensitive LIKE
+        for (String p : parsedQuery.getPathTerms()) {
+            sql.append(" AND absolute_path ILIKE ?");
+            params.add("%" + p + "%"); // find any path that has p inside it
+        }
+
+        List<String> tsTerms = new ArrayList<>();
+        tsTerms.addAll(parsedQuery.getContentTerms());
+        tsTerms.addAll(parsedQuery.getGlobalTerms());
+
+        if(!tsTerms.isEmpty()){
+            sql.append(" AND to_tsvector('english', name || ' ' || COALESCE(content_preview, '')) @@ plainto_tsquery('english', ?)");
+            params.add(String.join(" ", tsTerms));
+        }
+
+        Connection conn = dbConnection.getConnection();
+        try (PreparedStatement preparedStatement = conn.prepareStatement(sql.toString())) {
+            for(int i = 0; i < params.size(); i++){
+                preparedStatement.setString(i + 1, params.get(i));
+            }
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return resultBuilder.build(resultSet);
         }
     }
 }
