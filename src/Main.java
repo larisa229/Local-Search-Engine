@@ -70,6 +70,10 @@ public class Main {
                 }
 
                 String preview = contentExtractor.extractPreview(file);
+                String content = contentExtractor.extractContent(file);
+                PathScorer pathScorer = new PathScorer();
+                double pathScore = pathScorer.score(file);
+
                 FileRecord record = new FileRecord(
                         metadata.getAbsolutePath(),
                         metadata.getName(),
@@ -77,7 +81,9 @@ public class Main {
                         metadata.getSize(),
                         metadata.getLastModified(),
                         checksum,
-                        preview
+                        preview,
+                        content,
+                        pathScore
                 );
 
                 indexWriter.write(record);
