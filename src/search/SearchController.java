@@ -21,7 +21,7 @@ public class SearchController {
         }
 
         try {
-            String parsedQuery = parser.parse(query);
+            ParsedQuery parsedQuery = parser.parse(query);
             return executor.execute(parsedQuery);
         } catch (SQLException e) {
             System.err.println("Search failed: " + e.getMessage());
