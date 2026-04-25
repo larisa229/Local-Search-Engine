@@ -8,8 +8,9 @@ public class FileRecord {
     private final long lastModified;
     private final String checksum;
     private final String contentPreview;
+    private final String content;
 
-    public FileRecord(String absolutePath, String name, String extension, long size, long lastModified, String checksum, String contentPreview) {
+    public FileRecord(String absolutePath, String name, String extension, long size, long lastModified, String checksum, String contentPreview, String content) {
         this.absolutePath = absolutePath;
         this.name = name;
         this.extension = extension;
@@ -17,6 +18,7 @@ public class FileRecord {
         this.lastModified = lastModified;
         this.checksum = checksum;
         this.contentPreview = contentPreview;
+        this.content = content;
     }
 
     public String getAbsolutePath()   { return absolutePath; }
@@ -26,4 +28,5 @@ public class FileRecord {
     public long   getLastModified()   { return lastModified; }
     public String getChecksum()       { return checksum; }
     public String getContentPreview() { return contentPreview; }
+    public String getContent()       { return content; }
 }

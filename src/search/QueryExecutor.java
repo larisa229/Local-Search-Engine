@@ -37,7 +37,7 @@ public class QueryExecutor {
         tsTerms.addAll(parsedQuery.getGlobalTerms());
 
         if(!tsTerms.isEmpty()){
-            sql.append(" AND to_tsvector('english', name || ' ' || COALESCE(content_preview, '')) @@ plainto_tsquery('english', ?)");
+            sql.append(" AND search_vector @@ plainto_tsquery('english', ?)");
             params.add(String.join(" ", tsTerms));
         }
 
