@@ -21,10 +21,27 @@ public class QueryExecutor {
     }
 
     public List<SearchResult> execute(ParsedQuery parsedQuery) throws SQLException {
+        List<String> tsTerms = new ArrayList<>(parsedQuery.getContentTerms());
+        tsTerms.addAll(parsedQuery.getGlobalTerms());
+        boolean hasContentQuery = !tsTerms.isEmpty();
+        String joinedTerms = String.join(" ", tsTerms);
+
         StringBuilder sql = new StringBuilder(
-                "SELECT name, absolute_path, extension, size, content_preview, 1.0 as rank FROM files WHERE 1=1 "
+                "SELECT name, absolute_path, extension, size, content_preview, "
         );
+
+        if (hasContentQuery) {
+            sql.append("(path_score + ts_rank(search_vector, plainto_tsquery('english', ?))) AS rank ");
+        } else {
+            sql.append("path_score AS rank ");
+        }
+
+        sql.append("FROM files WHERE 1=1 ");
+
         List<String> params = new ArrayList<>();
+        if (hasContentQuery) {
+            params.add(joinedTerms); // for the rank expression
+        }
 
         // ILIKE - case-insensitive LIKE
         for (String p : parsedQuery.getPathTerms()) {
@@ -32,14 +49,12 @@ public class QueryExecutor {
             params.add("%" + p + "%"); // find any path that has p inside it
         }
 
-        List<String> tsTerms = new ArrayList<>();
-        tsTerms.addAll(parsedQuery.getContentTerms());
-        tsTerms.addAll(parsedQuery.getGlobalTerms());
-
-        if(!tsTerms.isEmpty()){
+        if (hasContentQuery) {
             sql.append(" AND search_vector @@ plainto_tsquery('english', ?)");
-            params.add(String.join(" ", tsTerms));
+            params.add(joinedTerms); // for the WHERE clause
         }
+
+        sql.append(" ORDER BY rank DESC");
 
         Connection conn = dbConnection.getConnection();
         try (PreparedStatement preparedStatement = conn.prepareStatement(sql.toString())) {
