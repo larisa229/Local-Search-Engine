@@ -122,6 +122,13 @@ public class Main {
                 System.out.print("> ");
                 continue;
             }
+            if (query.startsWith(":sort ")) {
+                String strategy = query.substring(6).trim();
+                searchController.setStrategy(strategy);
+                System.out.println("Ranking strategy set to: " + strategy);
+                System.out.print("> ");
+                continue;
+            }
 
             List<SearchResult> results = searchController.search(query);
             if(results.isEmpty()) {

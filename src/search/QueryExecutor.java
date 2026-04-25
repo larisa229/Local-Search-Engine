@@ -20,7 +20,7 @@ public class QueryExecutor {
         this.resultBuilder = resultBuilder;
     }
 
-    public List<SearchResult> execute(ParsedQuery parsedQuery) throws SQLException {
+    public List<SearchResult> execute(ParsedQuery parsedQuery, RankingStrategy strategy) throws SQLException {
         List<String> tsTerms = new ArrayList<>(parsedQuery.getContentTerms());
         tsTerms.addAll(parsedQuery.getGlobalTerms());
         boolean hasContentQuery = !tsTerms.isEmpty();
@@ -30,17 +30,12 @@ public class QueryExecutor {
                 "SELECT name, absolute_path, extension, size, content_preview, "
         );
 
-        if (hasContentQuery) {
-            sql.append("(path_score + ts_rank(search_vector, plainto_tsquery('english', ?))) AS rank ");
-        } else {
-            sql.append("path_score AS rank ");
-        }
-
+       sql.append(strategy.getSelectExpression()).append(" AS rank ");
         sql.append("FROM files WHERE 1=1 ");
 
         List<String> params = new ArrayList<>();
-        if (hasContentQuery) {
-            params.add(joinedTerms); // for the rank expression
+        if (strategy instanceof RelevanceRankingStrategy rel) {
+            params.add(rel.getTsQuery());
         }
 
         // ILIKE - case-insensitive LIKE
@@ -51,10 +46,10 @@ public class QueryExecutor {
 
         if (hasContentQuery) {
             sql.append(" AND search_vector @@ plainto_tsquery('english', ?)");
-            params.add(joinedTerms); // for the WHERE clause
+            params.add(joinedTerms);
         }
 
-        sql.append(" ORDER BY rank DESC");
+        sql.append(" ORDER BY ").append(strategy.getOrderByExpression());
 
         Connection conn = dbConnection.getConnection();
         try (PreparedStatement preparedStatement = conn.prepareStatement(sql.toString())) {

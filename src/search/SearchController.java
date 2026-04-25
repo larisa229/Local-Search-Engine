@@ -9,10 +9,15 @@ import java.util.List;
 public class SearchController {
     private final QueryParser parser;
     private final QueryExecutor executor;
+    private String currentStrategy = "relevance";
 
     public SearchController(QueryParser parser, QueryExecutor executor) {
         this.parser = parser;
         this.executor = executor;
+    }
+
+    public void setStrategy(String strategy) {
+        this.currentStrategy = strategy;
     }
 
     public List<SearchResult> search(String query) {
@@ -22,7 +27,9 @@ public class SearchController {
 
         try {
             ParsedQuery parsedQuery = parser.parse(query);
-            return executor.execute(parsedQuery);
+            String tsQuery = String.join(" ", parsedQuery.getContentTerms());
+            RankingStrategy strategy = RankingStrategyFactory.create(currentStrategy, tsQuery);
+            return executor.execute(parsedQuery, strategy);
         } catch (SQLException e) {
             System.err.println("Search failed: " + e.getMessage());
             return Collections.emptyList();
