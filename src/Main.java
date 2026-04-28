@@ -5,6 +5,7 @@ import model.FileMetadata;
 import model.FileRecord;
 import model.SearchResult;
 import search.*;
+import ui.SearchApp;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Main {
+/*public class Main {
     public static void main(String[] args) {
         String configPath = args.length > 0 ? args[0] : "config.properties";
         Config config = new Config(configPath);
@@ -26,10 +27,13 @@ public class Main {
         DatabaseConnection dbConnection = new DatabaseConnection(config);
         IndexWriter indexWriter = new IndexWriter(dbConnection);
 
+        SearchHistory searchHistory = new SearchHistory();
         SearchController searchController = new SearchController(
                 new QueryParser(),
-                new QueryExecutor(dbConnection, new ResultBuilder())
+                new QueryExecutor(dbConnection, new ResultBuilder()),
+                searchHistory
         );
+        searchController.addObserver(searchHistory);
 
         File rootDir = new File(config.getRootDirectory());
 
@@ -130,6 +134,11 @@ public class Main {
                 continue;
             }
 
+            List<String> suggestions = searchHistory.suggest(query);
+            if (!suggestions.isEmpty()) {
+                System.out.println("Similar past searches: " + suggestions);
+            }
+
             List<SearchResult> results = searchController.search(query);
             if(results.isEmpty()) {
                 System.out.println("No results found for: " + query);
@@ -147,5 +156,12 @@ public class Main {
         } catch (SQLException e) {
             System.err.println("Failed to close DB connection: " + e.getMessage());
         }
+    }
+}*/
+
+
+public class Main {
+    public static void main(String[] args) {
+        SearchApp.launch(SearchApp.class, args);
     }
 }
