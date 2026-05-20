@@ -12,6 +12,7 @@ public class ChangeDetector {
             SELECT checksum FROM files WHERE absolute_path = ?
             """;
 
+    // delete all rows whose path is not in the list of currently present files
     private static final String DELETE_STALE_SQL = """
             DELETE FROM files
             WHERE absolute_path <> ALL (?::text[])
@@ -52,6 +53,7 @@ public class ChangeDetector {
         }
 
         Connection conn = dbConnection.getConnection();
+        // create an SQL text array from the list of file paths
         Array pathArray = conn.createArrayOf("text", presentPaths.toArray());
         try (PreparedStatement stmt = conn.prepareStatement(DELETE_STALE_SQL)) {
             stmt.setArray(1, pathArray);

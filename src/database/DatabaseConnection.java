@@ -34,11 +34,12 @@ public class DatabaseConnection {
             } catch (SQLException e) {
                 attempts++;
                 System.err.println("Database connection attempt " + attempts + " failed: " + e.getMessage());
+                // if it can't connect after 3 tries throw a fatal error to stop the program
                 if(attempts >= MAX_RETRIES) {
                     throw new SQLException("Could not connect to database after " + MAX_RETRIES + " attempts.", e);
                 }
                 try {
-                    Thread.sleep(RETRY_DELAY_MS);
+                    Thread.sleep(RETRY_DELAY_MS);  // wait 2 seconds before trying to connect again
                 } catch (InterruptedException e1) {
                     Thread.currentThread().interrupt();
                     throw new SQLException("Interrupted while retrying database connection.", e1);
@@ -46,11 +47,5 @@ public class DatabaseConnection {
             }
         }
         throw new SQLException("Could not connect to the database.");
-    }
-
-    public void close() throws SQLException{
-        if(connection != null && !connection.isClosed()){
-            connection.close();
-        }
     }
 }

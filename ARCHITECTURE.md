@@ -20,7 +20,7 @@ The user interacts with it through a graphical interface, and all indexed conten
 > Containers Diagram: ![Containers Diagram](./diagrams/containers.png)
 
 The system is composed of four containers:
-1. **Search UI** - an interface where the user types queries and views results with file previews. Communicates with the Search Service over a local function call.
+1. **Search ui** - an interface where the user types queries and views results with file previews. Communicates with the Search Service over a local function call.
 2. **Search Service** - a Java application that accepts queries, executes full-text search against the database, and returns ranked results with previews.
 3. **Indexer** - a Java application that crawls the file system, extracts content and metadata, and populates the database. 
 4. **Database** - a PostgreSQL instance that stores file metadata, content snippets, and full-text search indexes.
@@ -35,45 +35,45 @@ The system is composed of four containers:
 
 The Indexer runs on startup and incrementally on file changes. It walks the file system, processes each file, and writes records to the database.
 
-**Crawler**  
+**indexer.Crawler**  
 Recursively traverses the file system from a root directory.  
 
-**FileFilter**  
+**indexer.FileFilter**  
 Applies configurable ignore rules to exclude unwanted files before any content is read.
 
-**ContentExtractor**  
+**indexer.ContentExtractor**  
 Reads file content and extracts a short preview.  
 
-**MetadataExtractor**  
+**indexer.MetadataExtractor**  
 Extracts file metadata: name, extension, size, timestamps.  
 
 **ChangeDetector**
 Compares current file state against the stored index to determine whether a record needs to be inserted, updated, or skipped.
 
-**IndexWriter**  
+**indexer.IndexWriter**  
 Batches processed file records and write them to the database.  
 
 ### Search Service
 
 > Search Service Component Diagram: ![Search Service Component Diagram](./diagrams/search_container.png)
 
-The Search Service receives queries from the UI, executes them against the database, and returns structured results.
+The Search Service receives queries from the ui, executes them against the database, and returns structured results.
 
-**SearchController**
-Receives incoming queries from the UI and coordinates the other components.
+**search.SearchController**
+Receives incoming queries from the ui and coordinates the other components.
 
-**QueryParser**  
+**search.QueryParser**  
 Parses raw user input into a structured query object. 
 
-**QueryExecutor**  
+**search.QueryExecutor**  
 Builds and runs full-text search queries against the database.
 
 **ResultBuilder**  
-Assembles query results into structured records ready for the UI to display.  
+Assembles query results into structured records ready for the ui to display.  
 
-### Search UI
+### Search ui
 
-The Search UI is the only container the user interacts with directly. It
+The Search ui is the only container the user interacts with directly. It
 sends queries to the Search Service and renders the results.
 
 ---

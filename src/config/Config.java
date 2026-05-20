@@ -10,7 +10,7 @@ public class Config {
     private final Properties properties;
 
     public Config(String configFilePath) {
-        properties = new Properties();
+        properties = new Properties(); // class designed for .properties files of key-value pairs
         try (FileInputStream fis = new FileInputStream(configFilePath)) {
             properties.load(fis);
         } catch (IOException e) {

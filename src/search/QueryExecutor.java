@@ -30,7 +30,7 @@ public class QueryExecutor {
                 "SELECT name, absolute_path, extension, size, content_preview, "
         );
 
-       sql.append(strategy.getSelectExpression()).append(" AS rank ");
+        sql.append(strategy.getSelectExpression()).append(" AS rank ");
         sql.append("FROM files WHERE 1=1 ");
 
         List<String> params = new ArrayList<>();
@@ -45,6 +45,7 @@ public class QueryExecutor {
         }
 
         if (hasContentQuery) {
+            // check if the stored search_vector contains tokens matching the query
             sql.append(" AND search_vector @@ plainto_tsquery('english', ?)");
             params.add(joinedTerms);
         }

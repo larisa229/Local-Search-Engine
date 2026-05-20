@@ -21,12 +21,8 @@ public class ContentExtractor {
             return lines.limit(PREVIEW_LINES)
                     .collect(Collectors.joining("\n"));
 
-        } catch (IOException | UncheckedIOException e) {
-            System.err.println("Could not read file: " + file.getAbsolutePath() +
-                    " — " + e.getMessage());
-            return "";
         } catch(Exception e) {
-            System.err.println("Unexpected error reading file: " + file.getAbsolutePath());
+            System.err.println("Could not read file: " + file.getAbsolutePath() + " - " + e.getMessage());
             return "";
         }
     }
