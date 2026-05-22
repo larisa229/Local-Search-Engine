@@ -15,8 +15,8 @@ public class IndexWriter {
     // if a row with the given path already exists, switch to update
     // if the insert fails, the data is kept by postgreSQL and labeled as EXCLUDED
     private static final String UPSERT_SQL = """
-        INSERT INTO files (absolute_path, name, extension, size, last_modified, checksum, content_preview, content, path_score, search_vector, indexed_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, to_tsvector('english', ? || ' ' || LEFT(COALESCE(?, ''), 500000)), ?) 
+        INSERT INTO files (absolute_path, name, extension, size, last_modified, checksum, content_preview, content, path_score, search_vector, indexed_at, dominant_color)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, to_tsvector('english', ? || ' ' || LEFT(COALESCE(?, ''), 500000)), ?, ?) 
                 ON CONFLICT (absolute_path) DO UPDATE SET
                     name             = EXCLUDED.name,
                     extension        = EXCLUDED.extension,
@@ -27,7 +27,8 @@ public class IndexWriter {
                     content          = EXCLUDED.content,
                     path_score       = EXCLUDED.path_score,
                     search_vector    = to_tsvector('english', EXCLUDED.name || ' ' || LEFT(COALESCE(EXCLUDED.content, ''), 500000)),
-                    indexed_at       = EXCLUDED.indexed_at
+                    indexed_at       = EXCLUDED.indexed_at,
+                    dominant_color    = EXCLUDED.dominant_color;
         """;
 
     public IndexWriter(DatabaseConnection connection) {
@@ -50,6 +51,7 @@ public class IndexWriter {
                 stmt.setString(10, record.getName());
                 stmt.setString(11, record.getContent());
                 stmt.setTimestamp(12, Timestamp.from(Instant.now()));
+                stmt.setString(13, record.getDominantColor());
                 stmt.executeUpdate();
             }
         } catch (SQLException e) {

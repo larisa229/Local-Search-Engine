@@ -12,9 +12,10 @@ public class FileRecord {
     private final String contentPreview;
     private final String content;
     private final double pathScore;
+    private final String dominantColor;
 
     public FileRecord(String absolutePath, String name, String extension, long size, long lastModified,
-                      String checksum, String contentPreview, String content, double pathScore) {
+                      String checksum, String contentPreview, String content, double pathScore, String dominantColor) {
         this.absolutePath = absolutePath;
         this.name = name;
         this.extension = extension;
@@ -24,6 +25,7 @@ public class FileRecord {
         this.contentPreview = contentPreview;
         this.content = content;
         this.pathScore = pathScore;
+        this.dominantColor = dominantColor;
     }
 
     public String getAbsolutePath()   { return absolutePath; }
@@ -35,4 +37,5 @@ public class FileRecord {
     public String getContentPreview() { return contentPreview; }
     public String getContent()       { return content; }
     public double getPathScore()     { return pathScore; }
+    public String getDominantColor() { return dominantColor; }
 }
