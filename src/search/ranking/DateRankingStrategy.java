@@ -1,4 +1,4 @@
-package search;
+package search.ranking;
 
 public class DateRankingStrategy implements RankingStrategy {
     @Override

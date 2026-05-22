@@ -1,4 +1,6 @@
-package search;
+package search.ranking;
+
+import search.SearchHistory;
 
 public class RankingStrategyFactory {
     public static RankingStrategy create(String name, String tsQuery, SearchHistory searchHistory) {

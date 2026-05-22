@@ -1,4 +1,4 @@
-package search;
+package search.ranking;
 
 public interface RankingStrategy {
     String getSelectExpression();  // what to put in the SELECT as rank

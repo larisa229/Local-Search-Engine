@@ -1,4 +1,6 @@
-package search;
+package search.ranking;
+
+import search.SearchHistory;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package search;
+package search.parsing;
 
 public class QueryParser {
 
@@ -15,6 +15,9 @@ public class QueryParser {
             } else if (part.startsWith("content:")) {
                 String value = part.substring(8);
                 if(!value.isEmpty()) parsedQuery.addContentTerm(value);
+            } else if (part.startsWith("color:")){
+                String value = part.substring(6);
+                if(!value.isEmpty()) parsedQuery.addColorTerm(value);
             } else {
                 parsedQuery.addGlobalTerm(part);
             }

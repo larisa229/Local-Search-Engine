@@ -1,4 +1,4 @@
-package search;
+package search.ranking;
 
 public class RelevanceRankingStrategy implements RankingStrategy {
     private final String tsQuery;

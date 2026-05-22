@@ -1,4 +1,4 @@
-package search;
+package search.ranking;
 
 public class PathScoreRankingStrategy implements RankingStrategy {
     @Override
