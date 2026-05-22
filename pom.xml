@@ -48,6 +48,10 @@
                     <configLocation>checkstyle.xml</configLocation>
                     <failsOnError>true</failsOnError>
                     <consoleOutput>true</consoleOutput>
+                    <sourceDirectories>
+                        ${project.basedir}/src/ui,
+                        ${project.basedir}/src/search
+                    </sourceDirectories>
                 </configuration>
             </plugin>
         </plugins>

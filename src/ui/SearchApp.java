@@ -8,10 +8,11 @@ import javafx.stage.Stage;
 import model.FileMetadata;
 import model.FileRecord;
 import search.*;
-
+import java.util.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SearchApp extends Application {
     private SearchController searchController;
@@ -24,12 +25,15 @@ public class SearchApp extends Application {
 
         IFileFilter filter = new FileFilter(config.getIgnoreExtensions(), config.getIgnoreDirectories());
         Crawler crawler = new Crawler(filter);
-        MetadataExtractor metadataExtractor = new MetadataExtractor();
-        ContentExtractor contentExtractor = new ContentExtractor();
         ChecksumCalculator checksumCalculator = new ChecksumCalculator();
+        MetadataExtractor metadataExtractor = new MetadataExtractor();
         DatabaseConnection dbConnection = new DatabaseConnection(config);
         IndexWriter indexWriter = new IndexWriter(dbConnection);
-        PathScorer pathScorer = new PathScorer();
+
+        FileProcessorFactory processorFactory = new FileProcessorFactory(List.of(
+                new TextFileProcessor(new ContentExtractor(), new PathScorer()),
+                new ImageFileProcessor(new PathScorer())
+        ));
 
         searchHistory = new SearchHistory();
         searchController = new SearchController(
@@ -58,14 +62,13 @@ public class SearchApp extends Application {
                     ChangeDetector.FileStatus status = changeDetector.getStatus(metadata.getAbsolutePath(), checksum);
                     if (status == ChangeDetector.FileStatus.UNCHANGED) { report.fileUnchanged(); continue; }
 
-                    String preview = contentExtractor.extractPreview(file);
-                    String content = contentExtractor.extractContent(file);
-                    double pathScore = pathScorer.score(file);
+                    Optional<FileProcessor> processor = processorFactory.getFileProcessor(file);
+                    if(processor.isEmpty()) {
+                        report.fileSkipped();
+                        continue;
+                    }
 
-                    FileRecord record = new FileRecord(
-                            metadata.getAbsolutePath(), metadata.getName(), metadata.getExtension(),
-                            metadata.getSize(), metadata.getLastModified(), checksum, preview, content, pathScore
-                    );
+                    FileRecord record = processor.get().process(file, metadata, checksum);
                     indexWriter.write(record);
                     report.fileIndexed();
 

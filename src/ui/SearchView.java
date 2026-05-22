@@ -52,7 +52,11 @@ public class SearchView {
 
         Label statusLabel = new Label("");
 
-        VBox root = new VBox(12, title, searchBar, suggestions, statusLabel, results);
+        HBox widgetBar = new HBox(10);
+        widgetBar.setAlignment(Pos.CENTER_LEFT);
+        widgetBar.setVisible(false);
+
+        VBox root = new VBox(12, title, searchBar, suggestions, statusLabel, results, widgetBar);
         root.setPadding(new Insets(20));
         root.setAlignment(Pos.TOP_CENTER);
 
@@ -89,11 +93,26 @@ public class SearchView {
                     if (searchResults.isEmpty()) {
                         statusLabel.setText("No results found.");
                         results.setItems(FXCollections.observableArrayList());
+                        widgetBar.getChildren().clear();
+                        widgetBar.setVisible(false);
                     } else {
                         statusLabel.setText(searchResults.size() + " result(s) found.");
                         results.setItems(FXCollections.observableArrayList(
                                 searchResults.stream().map(SearchResult::toString).toList()
                         ));
+
+                        List<Widget> activeWidgets = WidgetFactory.getActiveWidgets(searchResults);
+                        widgetBar.getChildren().clear();
+                        if (!activeWidgets.isEmpty()) {
+                            for (Widget widget : activeWidgets) {
+                                Button widgetButton = new Button(widget.getLabel());
+                                widgetButton.setOnAction(event -> widget.activate(searchResults));
+                                widgetBar.getChildren().add(widgetButton);
+                            }
+                            widgetBar.setVisible(true);
+                        } else {
+                            widgetBar.setVisible(false);
+                        }
                     }
                 });
             }).start();
