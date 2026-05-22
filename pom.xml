@@ -27,11 +27,7 @@
             <artifactId>javafx-controls</artifactId>
             <version>21.0.6</version>
         </dependency>
-        <dependency>
-            <groupId>Unknown</groupId>
-            <artifactId>Unknown</artifactId>
-            <version>Unknown</version>
-        </dependency>
+
     </dependencies>
 
     <build>
@@ -42,6 +38,16 @@
                 <version>0.0.8</version>
                 <configuration>
                     <mainClass>Main</mainClass>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.3.1</version>
+                <configuration>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <failsOnError>true</failsOnError>
+                    <consoleOutput>true</consoleOutput>
                 </configuration>
             </plugin>
         </plugins>
