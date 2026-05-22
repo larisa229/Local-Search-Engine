@@ -2,13 +2,15 @@ package search;
 
 import database.DatabaseConnection;
 import model.SearchResult;
+import search.parsing.ParsedQuery;
+import search.ranking.RankingStrategy;
+import search.ranking.RelevanceRankingStrategy;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class QueryExecutor {
@@ -48,6 +50,11 @@ public class QueryExecutor {
             // check if the stored search_vector contains tokens matching the query
             sql.append(" AND search_vector @@ plainto_tsquery('english', ?)");
             params.add(joinedTerms);
+        }
+
+        for (String color : parsedQuery.getColorTerms()) {
+            sql.append(" AND dominant_color = ?");
+            params.add(color.toLowerCase());
         }
 
         sql.append(" ORDER BY ").append(strategy.getOrderByExpression());

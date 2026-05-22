@@ -1,6 +1,11 @@
 package search;
 
 import model.SearchResult;
+import search.parsing.ParsedQuery;
+import search.parsing.QueryParser;
+import search.preprocessor.*;
+import search.ranking.RankingStrategy;
+import search.ranking.RankingStrategyFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,12 +17,21 @@ public class SearchController {
     private final QueryExecutor executor;
     private final SearchHistory searchHistory;
     private final List<SearchObserver> observers = new ArrayList<>();
+    private final QueryPreProcessor preProcessor;
     private String currentStrategy = "relevance";
 
     public SearchController(QueryParser parser, QueryExecutor executor, SearchHistory searchHistory) {
         this.parser = parser;
         this.executor = executor;
         this.searchHistory = searchHistory;
+
+        this.preProcessor = new LogicDecorator(
+                new SynonymDecorator(
+                        new SanitizationDecorator(
+                                new BasePreProcessor()
+                        )
+                )
+        );
     }
 
     public void addObserver(SearchObserver observer) {
@@ -36,7 +50,10 @@ public class SearchController {
         notifyObservers(query);
 
         try {
-            ParsedQuery parsedQuery = parser.parse(query);
+            String processedQuery = preProcessor.process(query);
+            System.out.println("Original: " + query);
+            System.out.println("Processed: " + processedQuery);
+            ParsedQuery parsedQuery = parser.parse(processedQuery);
             String tsQuery = String.join(" ", parsedQuery.getContentTerms());
             RankingStrategy strategy = RankingStrategyFactory.create(currentStrategy, tsQuery, searchHistory);
             return executor.execute(parsedQuery, strategy);

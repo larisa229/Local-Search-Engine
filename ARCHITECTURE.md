@@ -62,7 +62,7 @@ The Search Service receives queries from the ui, executes them against the datab
 **search.SearchController**
 Receives incoming queries from the ui and coordinates the other components.
 
-**search.QueryParser**  
+**search.parsing.QueryParser**  
 Parses raw user input into a structured query object. 
 
 **search.QueryExecutor**  

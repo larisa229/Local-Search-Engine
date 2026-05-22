@@ -21,7 +21,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import model.FileRecord;
 import search.QueryExecutor;
-import search.QueryParser;
+import search.parsing.QueryParser;
 import search.ResultBuilder;
 import search.SearchController;
 import search.SearchHistory;
