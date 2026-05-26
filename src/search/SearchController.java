@@ -3,10 +3,13 @@ package search;
 import model.SearchResult;
 import search.parsing.ParsedQuery;
 import search.parsing.QueryParser;
-import search.preprocessor.*;
 import search.ranking.RankingStrategy;
 import search.ranking.RankingStrategyFactory;
-
+import search.preprocessor.QueryPreProcessor;
+import search.preprocessor.LogicDecorator;
+import search.preprocessor.SynonymDecorator;
+import search.preprocessor.SanitizationDecorator;
+import search.preprocessor.BasePreProcessor;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
