@@ -49,8 +49,8 @@
                     <failsOnError>true</failsOnError>
                     <consoleOutput>true</consoleOutput>
                     <sourceDirectories>
-                        ${project.basedir}/src/ui,
-                        ${project.basedir}/src/search
+                        <sourceDirectory>${project.basedir}/src/ui</sourceDirectory>
+                        <sourceDirectory>${project.basedir}/src/search</sourceDirectory>
                     </sourceDirectories>
                 </configuration>
             </plugin>

@@ -1,5 +1,14 @@
 # Changelog
 
+## [3.0.0] - 2026-05-26
+### Added
+- Multimodal search with dominant color extraction from images
+- Strategy pattern for file type handling during indexing (TextFileProcessor, ImageFileProcessor)
+- Context-aware widgets: Gallery and Code Analyzer activated based on result set composition
+- Query pre-processor pipeline via Decorator pattern (SanitizationDecorator, SynonymDecorator, LogicDecorator)
+- Checkstyle linting with pre-commit hook
+- Git tags and CHANGELOG
+
 ## [2.0.0] - 2026-04-26
 ### Added
 - Full-text search with persistent tsvector and GIN index

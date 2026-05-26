@@ -7,10 +7,10 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.SearchResult;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.*;
 
 public class CodeAnalyzerWidget implements Widget {
     private static final List<String> CODE_EXTENSIONS = List.of(".java", ".py", ".js", ".html", ".css");
